@@ -17,7 +17,7 @@ const App = (props) => {
 
   return (
     <Grid container justify="center" style={{ height: "100vh", padding: "20px 10px" }}>
-      <Grid container item justify="center" xs={12}>
+      <Grid container item justify="center" xs={12} style={{ marginBottom: 20 }}>
         <img src={Logo} alt="Google Play Store App Tester" style={{ marginBottom: 0, maxWidth: 400, maxHeight: 208 }} />
       </Grid>
       <Grid container justify="center" style={{ marginBottom: 30 }}>
