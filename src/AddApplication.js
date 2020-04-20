@@ -2,6 +2,7 @@ import React from 'react';
 import { Grid, Typography, TextField, Card, CardContent, CircularProgress, Button, FormControl, FormControlLabel, Radio } from '@material-ui/core'
 import { categories, genres, contentRatings } from './utils/data'
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import axios from 'axios'
 
 
 const TestApplication = (props) => {
@@ -23,14 +24,17 @@ const TestApplication = (props) => {
         numInstalls: ""
     })
 
-    const submitForm = (e) => {
+    const submitForm = async (e) => {
         e.preventDefault()
         setLoading(true)
-        setTimeout(() => {
+        axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/addGooglePlayApp`, formValues).then((results) => {
             setLoading(false)
             setShowResults(true)
-        }, 2000)
+        }).catch((err) => {
+            console.log(err)
+        })
     }
+
     return (
         <>
             <Grid container justify="center" item xs={12}>
@@ -53,7 +57,7 @@ const TestApplication = (props) => {
                                         <TextField value={formValues.category} onChange={(e) => setFormValues({ ...formValues, category: e.target.value })} fullWidth required select SelectProps={{ native: true }} style={{ backgroundColor: "white" }} variant="outlined" label="Category">
                                             <option value="" />
                                             {categories.map((cat, index) => (
-                                                <option key={index} value="cat">{cat}</option>
+                                                <option key={index} value={cat}>{cat}</option>
                                             ))}
                                         </TextField>
                                     </Grid>

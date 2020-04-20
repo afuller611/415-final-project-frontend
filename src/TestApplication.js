@@ -2,12 +2,14 @@ import React from 'react';
 import { Grid, Typography, TextField, Card, CardContent, CircularProgress, Button } from '@material-ui/core'
 import { categories, genres, contentRatings } from './utils/data'
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import axios from 'axios'
 
 
 const TestApplication = (props) => {
     const [loading, setLoading] = React.useState(false)
     const [showResults, setShowResults] = React.useState(false)
     const [installsResponse, setInstallsResponse] = React.useState(0)
+    const [reviewsResponse, setReviewsResponse] = React.useState(0)
     const [formValues, setFormValues] = React.useState({
         name: "",
         category: "",
@@ -24,21 +26,24 @@ const TestApplication = (props) => {
         numInstalls: ""
     })
 
-    const submitForm = (e) => {
+    const submitForm = async (e) => {
         e.preventDefault()
         setLoading(true)
-        setTimeout(() => {
+        axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/googleplaystore`, formValues).then((results) => {
             setLoading(false)
             setShowResults(true)
-            setInstallsResponse(500)
-        }, 2000)
+            setInstallsResponse(results.data.installs)
+            setReviewsResponse(results.data.reviews)
+        }).catch((err) => {
+            console.log(err)
+        })
     }
 
     return (
         <>
             <Grid container justify="center" item xs={12} style={{ marginBottom: 20 }}>
                 <Grid item xs={12} sm={10} md={6}>
-                    <Typography style={{ color: "white", textAlign: "center", width: "100%" }} variant="h5">{"Enter information about your application that you will create or have created and we'll tell you how many installs we predict you'd get!"}</Typography>
+                    <Typography style={{ color: "white", textAlign: "center", width: "100%" }} variant="h5">{"Enter information about your application that you will create or have created and we'll tell you how many installs and how many reviews we predict you'd get!"}</Typography>
                 </Grid>
             </Grid>
             <Grid container justify="center" item xs={12}>
@@ -54,7 +59,7 @@ const TestApplication = (props) => {
                                         <TextField value={formValues.category} onChange={(e) => setFormValues({ ...formValues, category: e.target.value })} fullWidth required select SelectProps={{ native: true }} style={{ backgroundColor: "white" }} variant="outlined" label="Category">
                                             <option value="" />
                                             {categories.map((cat, index) => (
-                                                <option key={index} value="cat">{cat}</option>
+                                                <option key={index} value={cat}>{cat}</option>
                                             ))}
                                         </TextField>
                                     </Grid>
@@ -91,7 +96,7 @@ const TestApplication = (props) => {
                                     </Grid>
                                 </Grid>
                                 <Grid style={{ marginTop: 30 }} container justify={showResults ? "space-between" : "flex-end"} item xs={12}>
-                                    {showResults && <Typography variant="h5" style={{ color: "green" }}> We anticipate {installsResponse} installs!</Typography>}
+                                    {showResults && <Typography variant="h5" style={{ color: "green" }}> We anticipate {parseInt(installsResponse)} installs and {parseInt(reviewsResponse)} reviews!</Typography>}
                                     {loading ? <CircularProgress color="primary" /> :
                                         <Button type="submit" variant="contained" color="primary">Submit</Button>
                                     }
